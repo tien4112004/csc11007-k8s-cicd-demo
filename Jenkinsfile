@@ -5,11 +5,11 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'BRANCH_NAME', defaultValue: 'dev', description: 'Git branch to build')
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Git branch to build')
     }
 
     environment {
-        REPO_URL = 'https://github.com/ntquan/nodejs-app-ci-cd.git'
+        REPO_URL = 'https://github.com/tien4112004/csc11007-k8s-cicd-demo.git'
         BRANCH_NAME = "${params.BRANCH_NAME}"
         IMAGE_NAME = 'ntquan87/nodejs-app-ci-cd'
     }
@@ -60,22 +60,22 @@ pipeline {
                 }
             }
         }
-        // stage('Apply k8s') {
-        //     steps {
-        //         script {
-        //             echo "Deploy to k8s"
-        //             sh "helm upgrade --install --namespace=test-${LATEST_COMMIT}  --create-namespace jenkins-${LATEST_COMMIT} -f $helmValues $helmChart --set image.repository=${IMAGE_NAME} --set image.tag=${LATEST_COMMIT}"
-        //         }
-        //     }
-        // }
+        stage('Apply k8s') {
+            steps {
+                script {
+                    echo "Deploy to k8s"
+                    sh "helm upgrade --install --namespace=test-${LATEST_COMMIT}  --create-namespace jenkins-${LATEST_COMMIT} -f $helmValues $helmChart --set image.repository=${IMAGE_NAME} --set image.tag=${LATEST_COMMIT}"
+                }
+            }
+        }
     }
 
-    // post {
-    //     always {
-    //         // Clean up Docker images and containers
-    //         cleanWs()
-    //         sh 'docker system prune -af'
-    //         sh 'docker logout'
-    //     }
-    // }
+    post {
+        always {
+            // Clean up Docker images and containers
+            cleanWs()
+            sh 'docker system prune -af'
+            sh 'docker logout'
+        }
+    }
 }
